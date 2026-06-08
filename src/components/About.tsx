@@ -72,37 +72,33 @@ const experiences = [
     current: false,
     body: (
       <>
-        I designed and deployed a distributed{' '}
-        <strong className="font-medium text-zinc-800">AI/NLP pipeline</strong> for
-        meeting intelligence, integrating RAG with Top-K ranking across a
-        microservices architecture on AWS ECS Fargate, Step Functions, and Kafka to
-        process real-time meeting streams end-to-end. I cut database load and latency
-        by{' '}
-        <strong className="font-medium text-zinc-800">10x</strong> via Redis caching
-        and async processing, improving production reliability under concurrent
-        workloads. I also redesigned the speaker-identification pipeline using speech
-        diarization,{' '}
-        <strong className="font-medium text-zinc-800">OpenAI Whisper</strong> for
-        transcription, and{' '}
-        <strong className="font-medium text-zinc-800">GPT-OSS 120B</strong> with Groq
-        Cloud for real-time chat and suggestions.
+        I engineered a{' '}
+        <strong className="font-medium text-zinc-800">Qwen 2.5 VL multimodal inference pipeline</strong>{' '}
+        on AWS Bedrock with 4-bit quantization, achieving a{' '}
+        <strong className="font-medium text-zinc-800">1.2× increase in inference throughput</strong>{' '}
+        (tokens/sec) and eliminating 1,500 false positives. I architected a highly
+        scalable infrastructure using{' '}
+        <strong className="font-medium text-zinc-800">AWS Lambda and S3</strong>{' '}
+        to optimize a 500+ synthetic data pipeline for video meeting agents. I also
+        trained a Qwen Small Language Model using{' '}
+        <strong className="font-medium text-zinc-800">SFT and RLVR</strong>, achieving{' '}
+        <strong className="font-medium text-zinc-800">66% on seen domains</strong> and{' '}
+        <strong className="font-medium text-zinc-800">50% on unseen domains</strong>{' '}
+        for generalized tool use.
       </>
     ),
     stack: [
+      'PyTorch',
+      'Triton',
       'Python',
-      'React',
-      'Node.js',
+      'FastAPI',
       'PostgreSQL',
-      'MongoDB',
-      'Redis',
-      'Kafka',
-      'Langchain',
-      'AWS ECS Fargate',
-      'AWS Step Functions',
-      'S3',
-      'Lambda',
-      'Pinecone',
-      'Groq Cloud',
+      'AWS Bedrock',
+      'AWS Lambda',
+      'AWS S3',
+      'HuggingFace Transformers',
+      'Unsloth',
+      'WebRTC',
     ],
   },
   {
