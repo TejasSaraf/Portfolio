@@ -235,16 +235,16 @@ function About() {
 
   return (
     <div className="min-h-screen w-full md:min-h-0 md:h-dvh">
-      <aside className="flex min-h-[100dvh] flex-col border-b border-zinc-200 bg-white py-12 pl-16 pr-4 md:fixed md:inset-y-0 md:left-0 md:z-10 md:flex md:h-dvh md:min-h-0 md:w-1/2 md:border-b-0 md:py-16 md:overflow-hidden">
-        <div className="flex h-full min-h-0 w-full max-w-2xl flex-1 flex-col px-10 py-8">
+      <aside className="flex min-h-[100dvh] flex-col border-b border-zinc-200 bg-white py-10 px-5 md:fixed md:inset-y-0 md:left-0 md:z-10 md:flex md:h-dvh md:min-h-0 md:w-1/2 md:border-b-0 md:py-16 md:pl-16 md:pr-4 md:overflow-hidden">
+        <div className="flex h-full min-h-0 w-full max-w-2xl flex-1 flex-col px-2 py-4 md:px-10 md:py-8">
           <div className="flex min-h-0 flex-1 flex-col">
-            <p className="text-5xl font-bold tracking-tight text-zinc-900">
+            <p className="text-4xl font-bold tracking-tight text-zinc-900 md:text-5xl">
               Tejas Saraf
             </p>
-            <p className="mt-6 text-xl font-normal text-zinc-800">
+            <p className="mt-4 text-lg font-normal text-zinc-800 md:mt-6 md:text-xl">
               Grad at Illinois Institute of Technology
             </p>
-            <p className="mt-6 text-xl leading-relaxed text-zinc-800">
+            <p className="mt-4 text-lg leading-relaxed text-zinc-800 md:mt-6 md:text-xl">
               I&apos;m a Software Engineer interested in training large language models to
               reason about the world.
             </p>
@@ -304,9 +304,9 @@ function About() {
 
       <main
         ref={mainRef}
-        className="bg-white py-12 px-4 md:ml-[50%] md:w-1/2 md:py-16 md:pr-16"
+        className="bg-white py-10 px-5 md:ml-[50%] md:w-1/2 md:py-16 md:px-4 md:pr-16"
       >
-        <div className="space-y-40 md:space-y-40 px-10 py-8">
+        <div className="space-y-20 px-2 py-4 md:space-y-40 md:px-10 md:py-8">
           <section
             id="introduction"
             className="scroll-mt-8"
@@ -378,7 +378,7 @@ function About() {
             >
               Projects
             </h2>
-            <ul className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
               {projects.map((project) => (
                 <li key={project.id}>
                   <Link

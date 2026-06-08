@@ -264,7 +264,6 @@ export const projects: Project[] = [
     metrics: [
       { value: '1,000+', label: 'NIH clinical trials indexed' },
       { value: '30%', label: 'Fewer missed matches on queries' },
-      { value: 'Runner-up', label: 'Vivpro.ai Hackathon' },
     ],
     blogOverview:
       'ClinSearch is a full-stack clinical trial search application that lets medical researchers and patients query over 1,000+ NIH clinical trials using plain natural language. It combines LLM-based entity extraction with a tuned Elasticsearch bool query to significantly outperform keyword search — reducing missed matches by 30% on phase/condition-specific queries.',

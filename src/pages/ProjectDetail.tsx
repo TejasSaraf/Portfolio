@@ -70,7 +70,7 @@ export default function ProjectDetail() {
     <div className="min-h-screen bg-white">
       {/* Top nav */}
       <nav className="sticky top-0 z-50 border-b border-zinc-200 bg-white/95 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-3xl items-center gap-3 px-6 py-4">
+        <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3 md:px-6 md:py-4">
           <Link
             to="/#projects"
             className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900 transition-colors"
@@ -87,15 +87,15 @@ export default function ProjectDetail() {
 
       {/* Hero */}
       <div
-        className="px-6 py-20"
+        className="px-5 py-12 md:px-6 md:py-20"
         style={{
           background: `linear-gradient(135deg, ${project.heroBgColor}, ${project.heroBgColor2})`,
         }}
       >
         <div className="mx-auto max-w-3xl">
           <div className="text-5xl">{project.emoji}</div>
-          <h1 className="mt-4 text-4xl font-bold text-white">{project.title}</h1>
-          <p className="mt-2 text-lg text-white/90">{project.subtitle}</p>
+          <h1 className="mt-4 text-3xl font-bold text-white md:text-4xl">{project.title}</h1>
+          <p className="mt-2 text-base text-white/90 md:text-lg">{project.subtitle}</p>
           <p className="mt-1 font-mono text-sm text-white/70">{project.period}</p>
           {project.award && (
             <span className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-sm font-medium text-white backdrop-blur-sm">
@@ -107,7 +107,7 @@ export default function ProjectDetail() {
 
       {/* Metrics */}
       <div className="border-b border-zinc-100 bg-zinc-50">
-        <div className="mx-auto max-w-3xl px-6 py-8">
+        <div className="mx-auto max-w-3xl px-4 py-6 md:px-6 md:py-8">
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-3">
             {project.metrics.map((m) => (
               <div key={m.label}>
@@ -120,7 +120,7 @@ export default function ProjectDetail() {
       </div>
 
       {/* Article body */}
-      <article className="mx-auto max-w-3xl px-6 py-14">
+      <article className="mx-auto max-w-3xl px-4 py-10 md:px-6 md:py-14">
         {/* Overview lead */}
         <p className="text-lg leading-relaxed text-zinc-700">{project.blogOverview}</p>
 
