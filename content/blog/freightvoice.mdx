@@ -1,0 +1,60 @@
+---
+title: "How I Built a Self-Improving Voice Agent That Reached the YC Finalist Stage"
+slug: freightvoice
+date: "2026-05-15"
+categories:
+  - Voice AI
+  - Streaming
+description: "Freight brokers waste thousands of hours on repetitive carrier calls that follow predictable patterns but demand sub-second responsiveness. FreightVoice automates these calls with 0.5s end-to-end latency and a closed-loop eval system that improves its own prompts after every conversation — no human relabeling required. Built on Pipecat, vLLM-served Nemotron-3-Super-120B, and Cekura MCP."
+stack:
+  - Python
+  - FastAPI
+  - Pipecat
+  - vLLM
+  - Nemotron-3-Super-120B
+  - AWS SageMaker
+  - AWS ECR
+  - Twilio TwiML
+  - Nvidia ASR
+  - Cekura MCP
+  - WebSocket
+  - React
+  - WebRTC
+heroBgColor: "#059669"
+heroBgColor2: "#065f46"
+metrics:
+  - value: "0.5s"
+    label: "End-to-end call latency"
+  - value: "Self-improving"
+    label: "Eval loop via Cekura MCP"
+---
+
+## The Problem
+
+Freight brokers handle hundreds of repetitive carrier coordination calls daily — confirming load availability, negotiating rates, and updating shipment status. While these conversations follow predictable patterns, they require natural-sounding speech and fast responses. Even a 1–2 second response delay makes an agent sound robotic and erodes caller trust.
+
+The core challenge was building a voice agent that could handle these calls end-to-end with human-like responsiveness, and critically — one that continuously improves its own performance without manual prompt engineering between deployments.
+
+Existing voice AI solutions in logistics either rely on rigid IVR trees that frustrate callers, or use general-purpose LLMs with multi-second latency that make conversations feel stilted. Neither approach scales to the volume and nuance that freight coordination demands.
+
+## Architecture Overview
+
+The pipeline flows: incoming Twilio audio → Nvidia ASR transcription → vLLM-served Nemotron-3-Super-120B on AWS SageMaker for response generation → Nvidia TTS synthesis → back to Twilio. All stages are connected over WebSockets via Pipecat. A parallel eval loop through Cekura MCP scores every completed call and feeds structured improvements back into the system prompt.
+
+## Technical Deep-Dive
+
+**Why Pipecat over LiveKit or a custom WebSocket server?** Pipecat provides composable middleware for real-time voice AI — backpressure handling, interruption detection, and conversation turn-taking come built-in. LiveKit is optimized for multi-party video conferencing, not single-channel voice agent dialogues. A custom WebSocket server would have required reimplementing all the voice-specific state management that Pipecat handles natively.
+
+**Why vLLM-served Nemotron over a hosted API?** Hosted LLM APIs introduce variable latency (50–500ms network overhead per call) that compounds in voice pipelines where every millisecond matters. Self-hosting via vLLM on a persistent warm SageMaker GPU instance gives consistent sub-200ms inference with no cold starts. The container image was packaged via AWS ECR and deployed on ECS for reliable availability.
+
+**The self-improving eval loop** is the architectural differentiator. After every call, Cekura MCP automatically scores agent performance across rubrics: task completion, tone appropriateness, negotiation effectiveness, and factual accuracy. These structured scores are fed back into the system prompt context for subsequent calls. Over 50+ simulated calls, prompt quality measurably improved without any human relabeling.
+
+## Metrics and Results
+
+- **0.5s** end-to-end call latency (p95), from caller speech to agent response
+- **Self-improving** prompt quality over 50+ simulated calls via Cekura MCP eval loop
+- **YC Hackathon Finalist** — judges highlighted the self-improving eval loop as a novel contribution to voice AI, noting that most production voice systems require expensive human feedback loops
+
+## What I'd Do Differently
+
+I would add A/B testing infrastructure to the eval loop — currently it improves prompts monotonically, but there's no mechanism to detect when a prompt change helps one call type but hurts another. A bandit-style approach with per-category prompt variants would make the self-improvement more robust. I'd also explore replacing the separate ASR + LLM + TTS pipeline with a speech-to-speech model to eliminate the transcription bottleneck entirely.

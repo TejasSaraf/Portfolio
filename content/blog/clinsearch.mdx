@@ -1,0 +1,59 @@
+---
+title: "How I Reduced Missed Clinical Trial Matches by 30% with LLM-Powered Search"
+slug: clinsearch
+date: "2026-02-15"
+categories:
+  - Infrastructure
+description: "Researchers searching ClinicalTrials.gov miss relevant studies because keyword search can't bridge the gap between natural language and medical terminology. ClinSearch combines LLM entity extraction with tuned Elasticsearch bool queries to reduce missed matches by 30% on phase/condition-specific searches — making 1,000+ NIH trials discoverable through plain English queries."
+stack:
+  - Python
+  - FastAPI
+  - React
+  - Elasticsearch
+  - AWS OpenSearch
+  - LangChain
+  - LangGraph
+  - LLM
+  - RAG
+  - Docker
+  - TypeScript
+  - ETL
+heroBgColor: "#e11d48"
+heroBgColor2: "#881337"
+metrics:
+  - value: "1,000+"
+    label: "NIH clinical trials indexed"
+  - value: "30%"
+    label: "Fewer missed matches on queries"
+---
+
+## The Problem
+
+ClinicalTrials.gov provides access to thousands of NIH-registered studies, but its search interface is purely keyword-based. A researcher looking for "trials for aggressive breast cancer patients over 50 with prior chemo" would get poor results without knowing specific protocol terms like "HER2+", "metastatic", or exact eligibility identifiers.
+
+This isn't just an inconvenience — it means patients who could benefit from experimental treatments never find them, and researchers waste hours manually browsing studies that a semantic search would surface instantly.
+
+ClinSearch was built to bridge this gap — enabling natural-language queries that are semantically understood and translated into precise, structured Elasticsearch queries against a curated trial index.
+
+## Architecture Overview
+
+The system has two main flows. The ETL pipeline fetches and normalizes clinical trial records from the NIH API into AWS OpenSearch with structured fields. At query time, LangChain orchestrates LLM entity extraction from the natural-language query, maps entities to Elasticsearch field values, and composes a tuned bool query with field-specific relevance boosting. LangGraph manages multi-turn conversational refinement.
+
+## Technical Deep-Dive
+
+**Why a hybrid LLM + Elasticsearch approach over pure vector search?** Pure vector/embedding search treats all fields equally and loses the structured relationships between trial metadata (phase, condition, intervention). By extracting entities first and mapping them to specific Elasticsearch fields with custom boosting, the system respects the hierarchical importance of different trial attributes. Phase and condition fields get higher boosts because they're the primary filtering criteria for researchers.
+
+**The normalization challenge** is underappreciated. Raw trial data uses wildly inconsistent terminology — "Phase 2", "PHASE II", "phase 2/3" all refer to the same concept. The preprocessing layer maps all variants to canonical forms, which is essential for consistent faceted filtering and accurate relevance scoring. Without this, even perfect entity extraction would produce poor recall.
+
+**Multi-turn refinement via LangGraph** lets users iteratively narrow results with follow-up natural language queries. Each turn preserves the context of previous entity extractions, so "show me only Phase 3" applied after an initial broad search correctly constrains the existing result set rather than starting a new search.
+
+## Metrics and Results
+
+- **1,000+** NIH clinical trials indexed with normalized metadata
+- **30%** fewer missed matches on phase/condition-specific queries compared to keyword-only search
+- **Runner-up** in the Intelligent Clinical Trials Search Track at the Vivpro.ai Hackathon
+- Judges recognized the LLM entity extraction + Elasticsearch hybrid approach as a production-ready pattern
+
+## What I'd Do Differently
+
+I'd add a feedback loop where researchers can mark results as relevant/irrelevant, and use that signal to fine-tune the entity extraction model and Elasticsearch boosting weights over time. The current static boosting works well for common query patterns but underperforms on edge cases. I'd also explore indexing the full trial protocol documents (not just metadata) and using chunk-level retrieval for more granular matching.

@@ -1,0 +1,65 @@
+---
+title: "How I Built a Zero-Downtime Fundraising Platform Serving Top US Nonprofits"
+slug: fundteez
+date: "2026-04-20"
+categories:
+  - Infrastructure
+  - Streaming
+description: "Nonprofit fundraising platforms routinely lose donations to payment failures and reconciliation errors that erode trust with clients. Fundteez.com runs on fully containerized AWS infrastructure with 100% uptime, Stripe Connect-enforced 50/50 revenue splits with zero manual reconciliation, and 50% faster deployments via AWS CDK — serving the top US fundraising organizations."
+stack:
+  - React
+  - TypeScript
+  - Node.js
+  - Express
+  - PostgreSQL
+  - MongoDB
+  - Redis
+  - AWS ECS Fargate
+  - AWS CDK
+  - Stripe Connect
+  - Docker
+  - JWT (RS256)
+  - RDS
+  - SQS
+emoji: "💰"
+heroBgColor: "#2563eb"
+heroBgColor2: "#0e7490"
+metrics:
+  - value: "100%"
+    label: "Production uptime"
+  - value: "50%"
+    label: "Faster deployments via AWS CDK"
+  - value: "50/50"
+    label: "Revenue splits via Stripe Connect"
+---
+
+## The Problem
+
+Nonprofit organizations running fundraising campaigns need reliable payment processing, transparent revenue sharing, and zero tolerance for downtime during high-traffic campaign periods. A failed donation during a live fundraising event doesn't just lose revenue — it erodes donor trust permanently.
+
+Most white-label fundraising solutions either lack the infrastructure reliability for high-stakes campaigns or handle revenue splits through manual reconciliation that introduces errors and delays. The gap is a platform that enforces financial accuracy at the infrastructure level, not the spreadsheet level.
+
+Fundteez was built to solve both: bulletproof uptime on containerized AWS infrastructure, and Stripe-level enforcement of revenue distribution that removes human error from the equation.
+
+## Architecture Overview
+
+The platform runs as a containerized Node.js/Express API on AWS ECS Fargate behind an Application Load Balancer. PostgreSQL (RDS) handles structured data, MongoDB stores flexible document data, and Redis manages sessions and rate limiting. Payment webhooks are decoupled via SQS queues. The React frontend is served via S3 + CloudFront. CI/CD runs through AWS CodePipeline with blue/green ECS deployments.
+
+## Technical Deep-Dive
+
+**Why ECS Fargate over EC2 or Lambda?** EC2 requires instance management and capacity planning that doesn't justify the cost savings for this workload profile. Lambda's cold start latency and 15-minute execution limits make it unsuitable for long-running payment webhook processing. Fargate provides the right abstraction — container-level control without infrastructure management, with health-check-based rolling updates that achieve zero-downtime deployments.
+
+**Why enforce revenue splits at the Stripe level?** Manual reconciliation of revenue splits is the single biggest source of financial disputes in platform businesses. By using Stripe Connect with connected account transfers, the 50/50 gross revenue split is enforced at the payment processor level — both parties see real-time payout visibility in their respective Stripe dashboards, and there's a single source of truth regardless of network failures or client retries. Webhook events are verified with Stripe signatures and idempotency keys to prevent double-processing.
+
+**Infrastructure as Code via CDK** defines the entire stack in TypeScript — VPC, subnets, security groups, ECS services, RDS instances, SQS queues, and CodePipeline stages. This reduced deployment turnaround by 50% compared to manual ECS task definition updates and made environment replication trivial.
+
+## Metrics and Results
+
+- **100%** production uptime across the entire platform operating period
+- **50%** faster deployments via AWS CDK infrastructure-as-code compared to manual ECS updates
+- **50/50** revenue splits enforced at the Stripe Connect level with zero reconciliation errors
+- VPC network segmentation ensures the database tier is never exposed to the public internet
+
+## What I'd Do Differently
+
+I'd add a dedicated event sourcing layer for payment state transitions instead of relying on Stripe webhooks as the sole source of truth. Webhooks can be delayed or redelivered out of order, and while idempotency keys prevent double-processing, they don't help with state reconstruction during debugging. An append-only event log would make payment auditing and dispute resolution significantly faster.

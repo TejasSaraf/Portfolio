@@ -1,0 +1,65 @@
+---
+title: "How I Achieved Sub-100ms Incident Detection on Edge Hardware Without Cloud Dependency"
+slug: instamind
+date: "2026-05-10"
+categories:
+  - On-device ML
+  - Infrastructure
+description: "Cloud-based surveillance systems add multi-second latency to incident detection and create privacy compliance nightmares for enterprises. instaMIND.tech runs an entire video intelligence pipeline on-device — C++/OpenCV frame processing fused with a fine-tuned Gemma 3 vision model — achieving under 100ms P95 detection with zero cloud dependency. Fine-tuning ran 2x faster using Unsloth + QLoRA."
+stack:
+  - PyTorch
+  - Gemma 3
+  - C++
+  - PEFT/QLoRA
+  - Unsloth
+  - llama.cpp
+  - LangChain
+  - WebRTC
+  - OpenCV
+  - Python
+  - React
+  - FastAPI
+  - Supabase
+  - YOLOv8
+  - Pillow
+heroBgColor: "#7c3aed"
+heroBgColor2: "#3b0764"
+metrics:
+  - value: "<100ms"
+    label: "P95 incident detection latency"
+  - value: "2×"
+    label: "Faster Gemma 3 fine-tuning with Unsloth"
+  - value: "160ms"
+    label: "Voice agent chunk processing"
+---
+
+## The Problem
+
+Traditional cloud-based surveillance systems introduce multi-second latency in incident detection, making them unsuitable for real-time security response. Privacy regulations also make cloud-based video analysis unacceptable in many enterprise and residential deployments.
+
+The challenge was to build a complete video intelligence pipeline that runs on edge hardware, detects incidents in real time, and integrates a voice alerting system — all within the constraints of a single device without internet dependency.
+
+Existing edge AI solutions either sacrifice accuracy for speed (simple motion detection) or require expensive GPU hardware that isn't practical for standard surveillance deployments. The gap is a system that combines deep semantic understanding with edge-viable latency.
+
+## Architecture Overview
+
+The pipeline flows: camera input → C++/OpenCV frame capture and preprocessing → YOLOv8 object/person detection → Gemma 3 via llama.cpp for semantic incident classification → alert dispatch through Supabase edge functions. A separate voice agent using Gemma 3n 4B processes audio in 160ms chunks over WebRTC for verbal incident descriptions.
+
+## Technical Deep-Dive
+
+**Why C++ for the frame pipeline instead of Python?** Python's GIL and memory copying overhead make it unsuitable for real-time video processing at the frame rates needed for security. C++ with OpenCV allows zero-copy frame passing between pipeline stages and true parallel execution across CPU cores — critical for hitting the sub-100ms latency target on edge hardware.
+
+**Why QLoRA + Unsloth over standard PEFT?** Fine-tuning Gemma 3 for security-specific incident recognition within hackathon time constraints required maximum training efficiency. Unsloth patches PyTorch training ops for 2× memory efficiency, and combined with QLoRA 4-bit quantization via PEFT and Flash Attention 2, the fine-tuning process ran at twice the speed of a standard PEFT setup at equal accuracy. This made it practical to produce a domain-adapted model on a single consumer GPU.
+
+**The unified voice agent** uses Gemma 3n 4B — a multimodal model that processes voice and vision in a single model pass, eliminating the need for separate STT and TTS components. This is significantly lighter than typical voice pipelines and enables the agent to describe what it sees while simultaneously issuing alerts, without the latency overhead of two separate model calls.
+
+## Metrics and Results
+
+- **Under 100ms** P95 incident detection latency, fully on-device
+- **2×** faster Gemma 3 fine-tuning compared to standard PEFT (via Unsloth + QLoRA)
+- **160ms** voice agent chunk processing over WebRTC
+- Built and demonstrated at the **Google DeepMind × InstaLILY AI Hackathon**
+
+## What I'd Do Differently
+
+The YOLOv8 → Gemma 3 two-stage pipeline introduces unnecessary serialization between detection and understanding. A single end-to-end vision-language model that handles both object detection and semantic classification would reduce pipeline complexity and potentially improve latency further. I'd also invest in a proper model distillation step to create a smaller, faster model specifically optimized for the security incident classes we care about, rather than relying on general-purpose Gemma weights.

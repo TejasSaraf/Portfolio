@@ -1,0 +1,61 @@
+---
+title: "How I Compressed Diabetic Retinopathy Screening from Weeks to Under 8 Seconds"
+slug: opusai
+date: "2026-05-01"
+categories:
+  - On-device ML
+description: "Diabetic Retinopathy is the leading cause of preventable blindness, yet fundus image screening is bottlenecked by weeks-long specialist wait times. Opusai.live runs a fine-tuned PaliGemma 2 3B model entirely on clinic hardware — no cloud, no patient data leaving the device — delivering DR grading in under 8 seconds with 4× VRAM reduction via QLoRA."
+stack:
+  - Python
+  - PyTorch
+  - HuggingFace Transformers
+  - PaliGemma 2 3B
+  - QLoRA
+  - LoRA
+  - Ollama
+  - FastAPI
+  - Uvicorn
+  - React
+  - TypeScript
+  - Pillow
+heroBgColor: "#ea580c"
+heroBgColor2: "#92400e"
+metrics:
+  - value: "<8s"
+    label: "DR screening (was weeks)"
+  - value: "4×"
+    label: "VRAM reduction via QLoRA 4-bit"
+  - value: "100%"
+    label: "On-device — no patient data leaves"
+---
+
+## The Problem
+
+Diabetic Retinopathy is the leading cause of preventable blindness among working-age adults worldwide, yet screening is severely bottlenecked by ophthalmologist availability. Fundus images taken in clinics routinely wait weeks before a specialist reviews them — during which time the disease can progress to irreversible stages.
+
+The goal was to build a local AI assistant that could immediately analyze fundus images for DR signs, provide grading output, and integrate into existing clinical workflows — without any cloud dependency that would create HIPAA compliance exposure.
+
+Cloud-based diagnostic APIs exist, but they require transmitting patient medical images over the internet — a non-starter for many healthcare facilities due to regulatory requirements and patient consent constraints. The gap is a fully local system that matches cloud model accuracy while running on standard clinic workstation hardware.
+
+## Architecture Overview
+
+The inference flow: fundus image upload via React frontend → FastAPI preprocessing with Pillow (resize, normalize, CLAHE contrast enhancement) → Ollama-served fine-tuned PaliGemma 2 3B → structured severity grading report returned to the frontend. The entire stack runs offline on clinic hardware. Training used QLoRA 4-bit quantization on the IDRiD dataset via the PEFT library.
+
+## Technical Deep-Dive
+
+**Why PaliGemma 2 3B over larger vision models?** Larger VLMs (7B+) provide marginally better accuracy on medical imaging benchmarks but require dedicated GPU hardware that clinics don't have. PaliGemma 2 3B hits the sweet spot — small enough to run inference on standard workstation hardware via Ollama, large enough to maintain diagnostic accuracy across the five DR severity levels in the IDRiD dataset. The 3B parameter count also makes fine-tuning practical on a single consumer GPU.
+
+**Why QLoRA over full fine-tuning or standard LoRA?** Full fine-tuning of a 3B model requires ~24GB VRAM minimum — impractical for consumer GPUs. Standard LoRA reduces trainable parameters but still loads the base model in full precision. QLoRA combines 4-bit NF4 quantization of the base model with LoRA adapters, reducing VRAM usage by 4× while maintaining accuracy on the IDRiD held-out test set. This made it possible to fine-tune on the 516-image IDRiD dataset on a single GPU within the hackathon timeline.
+
+**CLAHE preprocessing** is critical for retinal images. Contrast Limited Adaptive Histogram Equalization enhances the visibility of lesion features (microaneurysms, hemorrhages, exudates) that are often subtle in raw fundus photographs, directly improving the model's detection sensitivity.
+
+## Metrics and Results
+
+- **Under 8 seconds** per fundus image screening (reduced from weeks of specialist wait time)
+- **4×** VRAM reduction via QLoRA 4-bit quantization compared to full-precision fine-tuning
+- **100%** on-device inference — no patient data leaves the clinic network
+- Demonstrated at **ScarletHacks 2026** with recognition for privacy-first AI-assisted medical diagnosis
+
+## What I'd Do Differently
+
+I'd validate on a larger, more diverse retinal dataset — IDRiD has only 516 images from a single demographic population, which limits generalizability claims. I'd also add uncertainty quantification to the model output so clinicians can see a confidence score alongside the severity grade, making it clear when the model is less certain and a human specialist review is warranted. Finally, I'd explore model distillation to create an even smaller model optimized specifically for the 5-class DR grading task.

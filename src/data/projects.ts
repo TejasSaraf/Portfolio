@@ -8,6 +8,8 @@ export interface Metric {
   label: string
 }
 
+export type Category = 'Voice AI' | 'Streaming' | 'On-device ML' | 'Infrastructure'
+
 export interface Project {
   id: string
   title: string
@@ -22,6 +24,7 @@ export interface Project {
   cardDesc: string
   award?: string
   cardAward?: string
+  categories: Category[]
   stack: string[]
   metrics: Metric[]
   blogOverview: string
@@ -44,6 +47,7 @@ export const projects: Project[] = [
     cardAward: 'YC Finalist',
     cardDesc:
       'AI-native self-improving voice agent for freight broker carrier coordination, cutting call latency to 0.5s.',
+    categories: ['Voice AI', 'Streaming'],
     stack: [
       'Python',
       'FastAPI',
@@ -111,6 +115,7 @@ export const projects: Project[] = [
     cardAward: 'DeepMind Hackathon',
     cardDesc:
       'On-device video intelligence for security surveillance with <100ms P95 detection using C++/OpenCV and fine-tuned Gemma 3.',
+    categories: ['On-device ML', 'Infrastructure'],
     stack: [
       'PyTorch',
       'Gemma 3',
@@ -179,6 +184,7 @@ export const projects: Project[] = [
     heroBgColor2: '#0e7490',
     cardDesc:
       'Production fundraising platform with 100% uptime on AWS ECS, Stripe Connect 50/50 revenue splits, and 50% faster deployments via CDK.',
+    categories: ['Infrastructure', 'Streaming'],
     stack: [
       'React',
       'TypeScript',
@@ -247,6 +253,7 @@ export const projects: Project[] = [
     cardAward: 'Vivpro.ai Hackathon',
     cardDesc:
       'Clinical NLP pipeline for natural-language search over 1,000+ NIH trials with LLM entity extraction, reducing missed matches by 30%.',
+    categories: ['Infrastructure'],
     stack: [
       'Python',
       'FastAPI',
@@ -312,6 +319,7 @@ export const projects: Project[] = [
     cardAward: 'ScarletHacks 2026',
     cardDesc:
       'Local AI diagnostic assistant reducing Diabetic Retinopathy screening from weeks to <8s using fine-tuned PaliGemma 2 3B with QLoRA 4-bit.',
+    categories: ['On-device ML'],
     stack: [
       'Python',
       'PyTorch',
